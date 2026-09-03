@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Runtime logs
+server.log
+server.err.log
+
+# Local AI assistant config and temp files
+.bob/
+
+# Salesforce CLI local org metadata (contains credentials)
+.sf/
+
+# Generated HTML report artefacts
+e2e-demo-preparation-guide.html
+headless-reporting-handover-summary.html
+headless-reporting-technical-solution-documentation.html
+
+# Environment variables (if added later)
+.env
+.env.*
