@@ -150,9 +150,8 @@ node Headless_Reporting_Agent.test.js
 
 ## Status
 
-This is a **working prototype**. The following items remain open:
+This is a **working prototype with a live SFMC connection**. The dashboard queries the `Comm_Log` DE in real time via the backend — no mock or seeded data is used.
 
-- **Dashboard hosting** — standalone web app vs. embed decision pending.
-- **Dashboard real-data layer** — the dashboard currently uses seeded mock data; wiring it to live session-state buckets from the backend is the remaining integration step.
+The one remaining open item is **dashboard hosting** (standalone web app vs. embed). Everything else is implemented.
 
-See [`Headless_Reporting_Agent_Spec.md`](Headless_Reporting_Agent_Spec.md) § 8 for the full open-items list.
+See [`Headless_Reporting_Agent_Spec.md`](Headless_Reporting_Agent_Spec.md) § 8 for the full resolved/open items list.

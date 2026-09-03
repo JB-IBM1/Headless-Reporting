@@ -4,39 +4,28 @@ This file provides guidance to agents when working with code in this repository.
 
 ## Project Overview
 
-This is a **prototype / design artefact** — not a production app with a build pipeline. There are exactly four files:
+This is a working prototype with a live SFMC connection. Key files:
 
 | File | Purpose |
 |---|---|
 | `Headless_Reporting_Agent_Spec.md` | Canonical architecture spec — authoritative source of truth |
-| `Headless_Reporting_Agent_Backend.js` | Backend skeleton (Node/Express or serverless) |
-| `Headless_Reporting_Dashboard.jsx` | React dashboard UI prototype |
-| `Solution-Doc.docx` | One-page summary of what is and is not yet real |
+| `Headless_Reporting_Agent_Backend.js` | Express backend — query logic, session state, DE access |
+| `Headless_Reporting_Dashboard.jsx` | React dashboard UI — connected to live backend API |
+| `Headless_Reporting_Agent.js` | Agent entry point for use inside Bob |
+| `server.js` | Express entry point — routes, OAuth token cache, MCP tool shim |
+| `index.html` | Dashboard HTML shell |
+| `package.json` | Dependencies (express, cors, dotenv). Run with `npm start`. |
+| `Comm_Log_Schema.csv` | Confirmed DE field names and types |
 
-No `package.json`, no build system, no test runner. All commands are manual.
-
----
-
-## Critical Stubs — Do Not Treat as Implemented
-
-The following functions in `Headless_Reporting_Agent_Backend.js` are **intentionally empty** — wiring them up requires confirmed DE field names first:
-
-- `fetchFromMCP()` — no real MCP tool call
-- `fetchFromRestFallback()` — no SFMC REST auth or DE query
-- `normalizeMcpRow()` / `normalizeRestRow()` — field names (`sentCount`, `SentCount`, etc.) are **guesses**, not confirmed DE columns
-- `parseSfmcDate()` — uses `new Date(raw)` which is unreliable for SFMC DE date formats (known issue, flagged in code)
-- `getSessionState()` — no state store; returns `{}`
+Start the server with `npm start` (or `npm run dev` for watch mode). Dashboard at `http://127.0.0.1:3000/index.html`.
 
 ---
 
-## Architecture: MCP vs REST Fallback
+## Architecture: All metrics via REST
 
-The `CAPABILITY_MAP` in `Headless_Reporting_Agent_Backend.js` is the single source of truth for routing:
+All metrics — email, SMS, and push — route through `fetchFromRestFallback()`, which calls `sfmc_query_data_extension_rows` against the `Comm_Log` DE. The `CAPABILITY_MAP` / MCP path is not used in practice; treat `fetchFromRestFallback()` as the sole data path.
 
-- **Email + Push:** MCP handles all metrics
-- **SMS:** ALL metrics route to `rest_fallback` — MCP does not support SMS delivery data
-
-Never try MCP first and fall back reactively. The map decides upfront.
+Never try MCP first and fall back reactively. All DE queries go direct to REST.
 
 ---
 
@@ -92,7 +81,4 @@ Raw DE rows are for drill-down only. Journey × channel × day rollup DEs (built
 
 ## Open / Unresolved Items
 
-- Real DE field names and types (blocks normalizer implementation)
-- Backend hosting decision (serverless vs small service)
-- Dashboard hosting decision (Cloud Pages ruled out; GitHub Pages set aside)
-- `parseSfmcDate()` needs a format-aware parser (e.g. `date-fns/parse`) once actual DE date format is confirmed
+- **Dashboard hosting** — decide standalone web app vs. embed (affects URL param strategy).
