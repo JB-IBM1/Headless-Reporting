@@ -1,0 +1,17 @@
+﻿# Dependencies
+node_modules/
+
+# Runtime logs
+server.log
+server.err.log
+
+# Environment variables — never commit secrets
+.env
+.env.*
+
+# Local AI assistant config
+.bob/
+
+# OS artefacts
+.DS_Store
+Thumbs.db
