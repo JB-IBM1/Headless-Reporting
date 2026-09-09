@@ -1,0 +1,1026 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Headless Reporting — Technical &amp; Solution Documentation</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #1f2328;
+    background: #ffffff;
+    padding: 40px 20px 60px;
+  }
+  .page { max-width: 760px; margin: 0 auto; }
+
+  /* ── Header ── */
+  .doc-header {
+    border-bottom: 2px solid #1f2328;
+    padding-bottom: 20px;
+    margin-bottom: 36px;
+  }
+  .doc-header .label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #57606a;
+    margin-bottom: 6px;
+  }
+  .doc-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .doc-header .subtitle {
+    color: #57606a;
+    font-size: 13px;
+  }
+  .meta-row {
+    display: flex;
+    gap: 24px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .meta-item { font-size: 12px; color: #57606a; }
+  .meta-item strong { color: #1f2328; }
+
+  /* ── TOC ── */
+  .toc {
+    background: #f7f8fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 18px 22px;
+    margin-bottom: 40px;
+  }
+  .toc h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em; color: #57606a; margin-bottom: 10px; }
+  .toc ol { padding-left: 18px; }
+  .toc li { margin: 4px 0; font-size: 13px; }
+  .toc a { color: #3b82d4; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .toc .sub { padding-left: 16px; list-style-type: lower-alpha; margin-top: 3px; }
+  .toc .sub li { margin: 2px 0; font-size: 12px; color: #57606a; }
+
+  /* ── Sections ── */
+  section { margin-bottom: 44px; }
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 18px;
+    color: #1f2328;
+  }
+  h2 .sec-num {
+    display: inline-block;
+    background: #1f2328;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 20px 0 8px;
+    color: #1f2328;
+  }
+  h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin: 14px 0 6px;
+    color: #57606a;
+  }
+  p { margin-bottom: 10px; color: #1f2328; }
+  ul, ol { padding-left: 20px; margin-bottom: 10px; }
+  li { margin-bottom: 4px; }
+
+  /* ── Callout boxes ── */
+  .callout {
+    border-left: 3px solid #e5e7eb;
+    padding: 10px 14px;
+    background: #f7f8fa;
+    border-radius: 0 4px 4px 0;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  .callout.warn  { border-left-color: #d97706; background: #fffbeb; }
+  .callout.info  { border-left-color: #3b82d4; background: #eff6ff; }
+  .callout.ok    { border-left-color: #16a34a; background: #f0fdf4; }
+  .callout.crit  { border-left-color: #dc2626; background: #fef2f2; }
+  .callout strong { display: block; margin-bottom: 3px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* ── Code ── */
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 12px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 3px;
+    padding: 1px 5px;
+    color: #1f2328;
+  }
+  pre {
+    background: #1e2432;
+    color: #cdd6f4;
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.55;
+    overflow-x: auto;
+    margin: 10px 0 14px;
+  }
+  pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 10px 0 16px;
+  }
+  th {
+    background: #f7f8fa;
+    border: 1px solid #e5e7eb;
+    padding: 7px 10px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    color: #57606a;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  td {
+    border: 1px solid #e5e7eb;
+    padding: 7px 10px;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #fafbfc; }
+
+  /* ── Status badges ── */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+  .badge-ok     { background: #dcfce7; color: #15803d; }
+  .badge-warn   { background: #fef9c3; color: #a16207; }
+  .badge-crit   { background: #fee2e2; color: #b91c1c; }
+  .badge-info   { background: #dbeafe; color: #1d4ed8; }
+  .badge-grey   { background: #f3f4f6; color: #57606a; }
+
+  /* ── Architecture diagram ── */
+  .arch-diagram {
+    background: #f7f8fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 20px;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    color: #1f2328;
+    overflow-x: auto;
+    margin: 14px 0;
+  }
+
+  /* ── Metric formula box ── */
+  .formula-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 10px 0 14px;
+  }
+  .formula {
+    background: #f7f8fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  .formula .name { font-weight: 600; color: #1f2328; }
+  .formula .expr { color: #57606a; font-family: "SFMono-Regular", Consolas, monospace; font-size: 11px; margin-top: 2px; }
+
+  /* ── Dependency matrix ── */
+  .dep-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+  .dep-row:last-child { border-bottom: none; }
+  .dep-name { font-weight: 600; font-size: 13px; min-width: 180px; }
+  .dep-detail { flex: 1; font-size: 13px; color: #57606a; }
+  .dep-detail strong { color: #1f2328; }
+
+  /* ── Footer ── */
+  .doc-footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    font-size: 11px;
+    color: #57606a;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  
+  <div class="doc-header">
+    <div class="label">AusNet · Salesforce Marketing Cloud</div>
+    <h1>Headless Reporting — Technical &amp; Solution Documentation</h1>
+    <div class="subtitle">Architecture, component inventory, data model, local dependencies, and productionisation requirements.</div>
+    <div class="meta-row">
+      <div class="meta-item"><strong>Status:</strong> Prototype / Design Artefact</div>
+      <div class="meta-item"><strong>Version:</strong> 1.2</div>
+      <div class="meta-item"><strong>Audience:</strong> Engineering, Platform, Architecture</div>
+      <div class="meta-item"><strong>Prepared:</strong> July 2025</div>
+      <div class="meta-item"><strong>Last Updated:</strong> July 2025 (agent test suite completed — 56 tests; test count corrections; E2E demo prep guide; handover summary artefact)</div>
+    </div>
+  </div>
+
+  
+  <div class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#s1">Executive Summary</a></li>
+      <li><a href="#s2">System Architecture</a>
+        <ol class="sub">
+          <li><a href="#s2a">Component Overview</a></li>
+          <li><a href="#s2b">Architecture Diagram</a></li>
+        </ol>
+      </li>
+      <li><a href="#s3">Data Layer</a>
+        <ol class="sub">
+          <li><a href="#s3a">Comm_Log Data Extension Schema</a></li>
+          <li><a href="#s3b">Metric Derivation Rules</a></li>
+          <li><a href="#s3c">Capability Routing Map</a></li>
+        </ol>
+      </li>
+      <li><a href="#s4">Backend Service</a>
+        <ol class="sub">
+          <li><a href="#s4a">Query Pipeline</a></li>
+          <li><a href="#s4b">Key Functions Reference</a></li>
+          <li><a href="#s4c">Date Parsing</a></li>
+          <li><a href="#s4d">Journey Discovery</a></li>
+          <li><a href="#s4e">Session Store</a></li>
+          <li><a href="#s4f">SFMC Authentication</a></li>
+        </ol>
+      </li>
+      <li><a href="#s5">Conversational Agent</a></li>
+      <li><a href="#s6">Dashboard</a></li>
+      <li><a href="#s7">Session State &amp; Chat↔Dashboard Handoff</a></li>
+      <li><a href="#s8">API Reference</a></li>
+      <li><a href="#s9">Test Suite</a></li>
+      <li><a href="#s10">Local Dependencies (What Is Not Yet Portable)</a></li>
+      <li><a href="#s11">Productionisation Requirements</a></li>
+      <li><a href="#s12">Open Items &amp; Known Gaps</a></li>
+    </ol>
+  </div>
+
+  
+  <section id="s1">
+    <h2><span class="sec-num">1</span>Executive Summary</h2>
+    <p>The Headless Reporting solution is an SFMC deliverability analytics system that gives AusNet operators two complementary interfaces to the same data: a natural-language chat agent for ad-hoc queries, and an interactive drill-down dashboard for visual exploration. Both surfaces share a server-side session object so context flows seamlessly between them — a user can ask a question in chat and open the result directly in the dashboard with a single confirmation.</p>
+    <p>The current codebase is a <strong>functional prototype running locally</strong>. All query logic, metric derivation, session state, and dashboard rendering are implemented. The gaps that remain before this can run in production are hosting, authentication hardening, state persistence, and removal of the local Bob MCP dependency. Those gaps are fully enumerated in Sections 9 and 10.</p>
+    <div class="callout info">
+      <strong>Prototype scope</strong>
+      The four source files (<code>Headless_Reporting_Agent_Backend.js</code>, <code>Headless_Reporting_Agent.js</code>, <code>Headless_Reporting_Dashboard.jsx</code>, <code>server.js</code>) are production-quality in logic and data handling. What is not yet production-ready is <em>where they run</em> and <em>how they are secured</em>.
+    </div>
+  </section>
+
+  
+  <section id="s2">
+    <h2><span class="sec-num">2</span>System Architecture</h2>
+
+    <h3 id="s2a">2a. Component Overview</h3>
+    <table>
+      <tr><th>File / Component</th><th>Role</th><th>Language / Runtime</th><th>Status</th></tr>
+      <tr>
+        <td><code>server.js</code></td>
+        <td>Express HTTP server. Serves the dashboard static files, exposes REST API endpoints for sessions and queries, handles SFMC OAuth2 token caching, and injects the MCP tool shim into every request.</td>
+        <td>Node.js ≥ 18, ESM</td>
+        <td><span class="badge badge-ok">Implemented</span></td>
+      </tr>
+      <tr>
+        <td><code>Headless_Reporting_Agent_Backend.js</code></td>
+        <td>Core query pipeline: query parser, capability router, SFMC REST client (<code>fetchFromRestFallback</code>), normaliser, metric calculator, session store, journey discovery, and overview aggregator.</td>
+        <td>Node.js ≥ 18, ESM</td>
+        <td><span class="badge badge-ok">Implemented</span></td>
+      </tr>
+      <tr>
+        <td><code>Headless_Reporting_Agent.js</code></td>
+        <td>Conversational layer. Parses natural-language intent, orchestrates backend calls, formats chat replies, manages pending dashboard handoff offers, and enforces the confirmation-before-state-mutation rule.</td>
+        <td>Node.js ≥ 18, ESM</td>
+        <td><span class="badge badge-ok">Implemented</span></td>
+      </tr>
+      <tr>
+        <td><code>Headless_Reporting_Dashboard.jsx</code></td>
+        <td>React SPA. Three drill levels (Overview → Journey → Message). Polls session state, renders KPI tiles, trend charts (Recharts), sortable tables, status breakdown, sparklines, and CSV export. Global filter bar with date-range picker, channel selector, and status pill group.</td>
+        <td>React 18, Recharts 2, Lucide icons — delivered via CDN UMD + runtime Babel transpile</td>
+        <td><span class="badge badge-ok">Implemented</span></td>
+      </tr>
+      <tr>
+        <td><code>index.html</code></td>
+        <td>Entry page. Resolves or creates a session ID (URL param → localStorage → UUID), bootstraps CDN dependencies, fetches and Babel-transpiles the dashboard JSX at runtime, then mounts the React app.</td>
+        <td>HTML / Vanilla JS</td>
+        <td><span class="badge badge-ok">Implemented</span></td>
+      </tr>
+      <tr>
+        <td><code>e2e-demo-preparation-guide.html</code></td>
+        <td>End-to-end demo preparation guide. Covers environment checklist (server, .env, SFMC credentials, Bob/MCP), environment variable reference, and a timed 15–20 minute demo script with what to say and what to show at each step. Chat ↔ Dashboard session sharing tip included.</td>
+        <td>Static HTML artefact</td>
+        <td><span class="badge badge-ok">Implemented</span></td>
+      </tr>
+      <tr>
+        <td><code>headless-reporting-handover-summary.html</code></td>
+        <td>One-page handover summary for stakeholders. Covers what is real (implemented and passing), what is not yet real (stubs and local dependencies), and next steps for productionisation.</td>
+        <td>Static HTML artefact</td>
+        <td><span class="badge badge-ok">Implemented</span></td>
+      </tr>
+      <tr>
+        <td>SFMC Comm_Log DE</td>
+        <td>Single source of truth. One row per communication event; refreshed by an existing SQL Query Activity (hourly). Queried via SFMC REST API (<code>/data/v1/customobjectdata/key/{key}/rowset</code>).</td>
+        <td>SFMC Data Extension</td>
+        <td><span class="badge badge-ok">In production in SFMC</span></td>
+      </tr>
+      <tr>
+        <td>IBM Bob / SFMC MCP Server</td>
+        <td>Currently the <em>only</em> mechanism the agent uses to call SFMC when running inside the Bob context. The <code>server.js</code> MCP shim replicates this for standalone use.</td>
+        <td>IBM Bob agent platform</td>
+        <td><span class="badge badge-warn">Local dependency — see §9</span></td>
+      </tr>
+    </table>
+
+    <h3 id="s2b">2b. Architecture Diagram</h3>
+    <div class="arch-diagram">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        USER SURFACES                                    │
+│                                                                         │
+│   ┌──────────────────────┐        ┌──────────────────────────────────┐  │
+│   │  Chat (IBM Bob UI)   │        │  Dashboard (browser / index.html) │  │
+│   │  handleUserMessage() │        │  App { sessionId, baseUrl }       │  │
+│   └──────────┬───────────┘        └─────────────────┬────────────────┘  │
+│              │  natural-language input               │  GET/POST/PATCH   │
+└──────────────┼───────────────────────────────────────┼──────────────────┘
+               │                                       │
+               ▼                                       ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│               server.js  (Express, port 3000, 127.0.0.1)                │
+│                                                                         │
+│  GET  /session/:id/state          POST /api/overview                    │
+│  PATCH /session/:id/state         POST /api/query                       │
+│                                   POST /api/query/message               │
+│                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────┐    │
+│  │          Headless_Reporting_Agent_Backend.js                    │    │
+│  │                                                                 │    │
+│  │  parseQuery()  ──►  fetchFromRestFallback()  ──►  normalise()  │    │
+│  │                           │                                     │    │
+│  │  SESSION_STORE (Map)  ◄───┘     computeRates()                 │    │
+│  │  getSessionState()  patchSessionState()  setSessionDetail()     │    │
+│  │  runQueryOverview()  discoverJourneyNames()                     │    │
+│  └────────────────────────────┬────────────────────────────────────┘    │
+│                               │                                         │
+│  ┌────────────────────────────▼────────────────────────────────────┐    │
+│  │   MCP Tool Shim  (server.js sfmc_query_data_extension_rows)     │    │
+│  │   → SFMC REST  /data/v1/customobjectdata/key/{key}/rowset       │    │
+│  │   → OAuth2 client-credentials token cache (5-min early expiry) │    │
+│  └────────────────────────────┬────────────────────────────────────┘    │
+└────────────────────────────────┼────────────────────────────────────────┘
+                                 │  HTTPS + Bearer token
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│              Salesforce Marketing Cloud                                 │
+│                                                                         │
+│   Comm_Log Data Extension  (CustomerKey: 69C7427F-DC32-4114-…)         │
+│   Refreshed hourly by existing SQL Query Activity                       │
+└─────────────────────────────────────────────────────────────────────────┘
+    </div>
+    <p><strong>State flow summary:</strong> The chat agent and dashboard never talk to each other directly. Both read and write via the session endpoints on the same Express server. The server's in-memory <code>SESSION_STORE</code> (a <code>Map</code>) is the single synchronisation point. The dashboard polls <code>GET /session/:id/state</code> every 15 seconds and re-renders when <code>updatedAt</code> advances.</p>
+  </section>
+
+  
+  <section id="s3">
+    <h2><span class="sec-num">3</span>Data Layer</h2>
+
+    <h3 id="s3a">3a. Comm_Log Data Extension Schema</h3>
+    <p>All metrics are derived from a single, flat event-log DE. Every communication event — send, delivery confirmation, open, click, bounce, or undeliverable status — is one row.</p>
+
+    <table>
+      <tr><th>Field</th><th>Type</th><th>Key Use</th><th>Notes</th></tr>
+      <tr><td><code>SubscriberKey</code></td><td>Text(4000)</td><td>Contact identity</td><td>Not nullable</td></tr>
+      <tr><td><code>JobID</code></td><td>Text(50)</td><td>Send job reference</td><td>Not nullable</td></tr>
+      <tr><td><code>CommunicationType</code></td><td>Text(50)</td><td><strong>Channel filter</strong></td><td>Values: <code>Email</code>, <code>SMS</code>, <code>Push</code></td></tr>
+      <tr><td><code>MessageName</code></td><td>Text(250)</td><td><strong>Journey/message filter</strong></td><td>Includes channel suffix e.g. <code>_Email</code>, <code>_SMS</code> — stripped to derive stem</td></tr>
+      <tr><td><code>MessageStatus</code></td><td>Text(50)</td><td><strong>All metric counts</strong></td><td>Exhaustive set: <code>Sent</code>, <code>Delivered</code>, <code>Opened</code>, <code>Clicked</code>, <code>Bounced</code>, <code>Undelivered</code></td></tr>
+      <tr><td><code>SentDate</code></td><td>Date</td><td><strong>Time-series grouping</strong></td><td>REST format: <code>M/D/YYYY h:mm:ss AM/PM</code> — explicit parser implemented</td></tr>
+      <tr><td><code>JourneyName</code></td><td>Text(250)</td><td>Journey reference</td><td>Populated for Email; <em>not populated for SMS</em> — use <code>MessageName</code> stem instead</td></tr>
+      <tr><td><code>Email</code></td><td>EmailAddress(254)</td><td>Recipient (email)</td><td>Nullable</td></tr>
+      <tr><td><code>Mobile</code></td><td>Text(50)</td><td>Recipient (SMS)</td><td>Nullable</td></tr>
+      <tr><td><code>smsUndeliveredStatus</code></td><td>Text(150)</td><td>SMS failure reason code</td><td>Nullable; drill-down only</td></tr>
+      <tr><td><code>smsUndeliveredReason</code></td><td>Text(250)</td><td>SMS failure reason text</td><td>Nullable; drill-down only</td></tr>
+      <tr><td><code>AffectedCustomerId</code>, <code>IncidentId</code>, <code>NMI</code></td><td>Text</td><td>Business correlation</td><td>Operational context fields — not used in metric aggregation</td></tr>
+      <tr><td><code>MailingStreet</code>, <code>MailingCity</code>, <code>MailingState</code>, <code>MailingPostcode</code></td><td>Text</td><td>Postal address</td><td>Present for postal/letter channel entries</td></tr>
+      <tr><td><code>view_email_url</code></td><td>Text(300)</td><td>Email preview link</td><td>Nullable; included in detail screens</td></tr>
+    </table>
+
+    <h3 id="s3b">3b. Metric Derivation Rules</h3>
+    <p>All six metrics are computed from <code>COUNT(*)</code> grouped by which <code>MessageStatus</code> values qualify for each set. The <code>SENT</code> superset always equals the total row count for the query window.</p>
+
+    <table>
+      <tr><th>Metric</th><th>Qualifying MessageStatus values</th></tr>
+      <tr><td><code>sent</code></td><td>Sent, Delivered, Opened, Clicked, Bounced, Undelivered (all rows)</td></tr>
+      <tr><td><code>delivered</code></td><td>Delivered, Opened, Clicked</td></tr>
+      <tr><td><code>bounced</code></td><td>Bounced</td></tr>
+      <tr><td><code>undelivered</code></td><td>Undelivered</td></tr>
+      <tr><td><code>opens</code></td><td>Opened</td></tr>
+      <tr><td><code>clicks</code></td><td>Clicked</td></tr>
+    </table>
+
+    <p>Derived rate formulas (computed in <code>computeRates()</code> after aggregation):</p>
+    <div class="formula-box">
+      <div class="formula"><div class="name">Delivery Rate</div><div class="expr">delivered / sent × 100</div></div>
+      <div class="formula"><div class="name">Bounce Rate</div><div class="expr">bounced / sent × 100</div></div>
+      <div class="formula"><div class="name">Undelivered Rate</div><div class="expr">undelivered / sent × 100</div></div>
+      <div class="formula"><div class="name">Open Rate</div><div class="expr">opens / delivered × 100</div></div>
+      <div class="formula"><div class="name">Click Rate</div><div class="expr">clicks / delivered × 100</div></div>
+      <div class="formula"><div class="name">CTOR</div><div class="expr">clicks / opens × 100</div></div>
+    </div>
+    <p>The three delivery-side rates (<em>delivered + bounced + undelivered</em>) sum to 100% by construction. Open and click rates use the delivered audience as denominator — not total sent — to reflect reachable contacts only.</p>
+
+    <h3 id="s3c">3c. Capability Routing Map</h3>
+    <p>All six metrics for all three channels currently route to <code>rest_fallback</code> (the Comm_Log DE via REST API). The <code>CAPABILITY_MAP</code> constant in the backend is the single source of truth for routing decisions and can be updated per metric/channel as requirements evolve.</p>
+    <div class="callout info">
+      <strong>Why not MCP for email opens/clicks?</strong>
+      Email opens and clicks are present as <code>MessageStatus</code> values in the Comm_Log DE, making the DE authoritative for all six metrics. Using a single source avoids a split query and a merge step, and eliminates any risk of count discrepancy between the two sources.
+    </div>
+  </section>
+
+  
+  <section id="s4">
+    <h2><span class="sec-num">4</span>Backend Service</h2>
+
+    <h3 id="s4a">4a. Query Pipeline</h3>
+    <p>Every query — whether originating from the chat agent or a dashboard API call — passes through the same pipeline:</p>
+    <ol>
+      <li><strong>Parse</strong> (<code>parseQuery()</code>) — validates and normalises the structured request, resolves relative date presets (defaults to <code>last_30d</code> when no range is specified), inherits missing fields from session state, derives <code>groupBy</code> (≤ 3 days → <code>"hour"</code>, else <code>"day"</code>), and applies the drill-level mismatch guard (message-level is auto-corrected to journey-level when span &gt; 30 days).</li>
+      <li><strong>Route</strong> (<code>planQuery()</code>) — consults <code>CAPABILITY_MAP</code> and groups metrics by backend. Currently all metrics go to <code>rest_fallback</code>.</li>
+      <li><strong>Fetch</strong> (<code>fetchFromRestFallback()</code>) — issues a paginated <code>GET /data/v1/customobjectdata</code> query with a SFMC filter expression. Pages through 2,500-row batches until the result set is exhausted. The DE endpoint silently ignores <code>sentdate</code> filters, so date-range filtering is applied in-memory in the normaliser.</li>
+      <li><strong>Normalise</strong> — two normaliser paths depending on query type:
+        <ul>
+          <li><code>normalizeRestRows()</code> — groups raw DE rows into time-series <code>MetricBucket[]</code> objects keyed by day or hour ISO string. Counts rows per bucket by <code>MessageStatus</code> membership. Applies in-memory date range filter.</li>
+          <li><code>normalizeMessageRows()</code> — groups the same raw rows by <code>MessageName</code>, producing a <code>MessageEntry[]</code> (one entry per distinct message, each with its own <code>MetricBucket[]</code>). Used by the Journey Detail screen to populate the message table. Results are sorted by total sent descending.</li>
+        </ul>
+      </li>
+      <li><strong>Status filtering</strong> (<code>filterByStatus()</code>) — applied to <code>MetricBucket[]</code> after normalisation when the dashboard's status filter pill is not <code>"all"</code>. Zeroes all metric columns except the selected status while preserving <code>sent</code> as the denominator for rate calculations.</li>
+      <li><strong>Rate calculation</strong> (<code>computeRates()</code>) — adds the six derived rate fields to each bucket. Returns a new object; does not mutate the original.</li>
+      <li><strong>Session write</strong> — stores the result in <code>SESSION_STORE</code> via <code>setSessionDetail()</code> and advances <code>viewState.updatedAt</code> so the dashboard's staleness guard triggers a re-render.</li>
+    </ol>
+
+    <h3 id="s4b">4b. Key Functions Reference</h3>
+    <table>
+      <tr><th>Function</th><th>Signature</th><th>Purpose</th></tr>
+      <tr>
+        <td><code>parseQuery(raw, inheritedState)</code></td>
+        <td>→ <code>{journeyId, channel, metrics, dateRange, groupBy, drillLevel}</code></td>
+        <td>Validates and normalises a structured query. Defaults range to <code>last_30d</code> if not specified anywhere.</td>
+      </tr>
+      <tr>
+        <td><code>computeRates(bucket)</code></td>
+        <td><code>MetricBucket</code> → <code>MetricBucket &amp; rates</code></td>
+        <td>Adds six derived rate fields. Returns new object; original is not mutated. Safe on zero denominators.</td>
+      </tr>
+      <tr>
+        <td><code>filterByStatus(buckets, status)</code></td>
+        <td><code>(MetricBucket[], string)</code> → <code>MetricBucket[]</code></td>
+        <td>Zeroes all columns except the selected status metric while preserving <code>sent</code>. Returns new array; original is not mutated.</td>
+      </tr>
+      <tr>
+        <td><code>normalizeRestRows(rows, groupBy, dateRange?)</code></td>
+        <td><code>(Object[], string, Object?)</code> → <code>MetricBucket[]</code></td>
+        <td>Groups raw DE rows into time-series buckets by day or hour. Applies in-memory date range filter.</td>
+      </tr>
+      <tr>
+        <td><code>normalizeMessageRows(rows, groupBy, dateRange?)</code></td>
+        <td><code>(Object[], string, Object?)</code> → <code>MessageEntry[]</code></td>
+        <td>Groups raw DE rows by <code>MessageName</code>. Each entry has <code>{id, name, channel, buckets[]}</code>. Sorted by total sent descending. Buckets include computed rates.</td>
+      </tr>
+      <tr>
+        <td><code>parseSfmcDate(raw, groupBy)</code></td>
+        <td><code>(string, string)</code> → <code>string | null</code></td>
+        <td>Explicit SFMC date parser. Handles two confirmed formats — see §4c.</td>
+      </tr>
+      <tr>
+        <td><code>patchSessionState(sessionId, patch, updatedBy?)</code></td>
+        <td>→ <code>{session, corrected}</code></td>
+        <td>Merges patch fields into <code>viewState</code>. Applies drill-level mismatch guard. Stamps <code>updatedBy</code> and <code>updatedAt</code>. Initialises new session on first call.</td>
+      </tr>
+      <tr>
+        <td><code>discoverJourneyNames(mcpTools)</code></td>
+        <td>→ <code>string[]</code></td>
+        <td>Scans <code>MessageName</code> values, strips channel suffixes, returns up to 100 distinct stems.</td>
+      </tr>
+      <tr>
+        <td><code>runQueryMessage(params, mcpTools)</code></td>
+        <td>→ <code>NormalizedResponse</code></td>
+        <td>Journey-level query. Returns buckets + messages array (from <code>normalizeMessageRows</code>) for Journey Detail screen.</td>
+      </tr>
+      <tr>
+        <td><code>runQueryOverview(journeyNames, params, mcpTools)</code></td>
+        <td>→ <code>JourneyEntry[]</code></td>
+        <td>Fans out parallel queries to all discovered journeys. Stores results in <code>SESSION_STORE.journeys</code>.</td>
+      </tr>
+    </table>
+
+    <h3 id="s4c">4c. Date Parsing — <code>parseSfmcDate()</code></h3>
+    <p>The SFMC REST API returns <code>Date</code> DE columns in different string formats depending on the channel and SFMC locale configuration. Both confirmed formats are handled by explicit regex matching — <code>new Date()</code> is never used because it guesses the format and produces wrong results on ambiguous strings.</p>
+    <div class="callout info">
+      <strong>Two confirmed date formats</strong>
+      The parser handles both; falling back to ISO string detection as a tertiary path.
+    </div>
+    <table>
+      <tr><th>Format</th><th>Example</th><th>Used by</th><th>Pattern</th></tr>
+      <tr>
+        <td>US locale (email rows)</td>
+        <td><code>3/24/2025 11:45:00 AM</code></td>
+        <td>Email, Push</td>
+        <td><code>M/D/YYYY h:mm:ss AM/PM</code></td>
+      </tr>
+      <tr>
+        <td>AU locale (SMS rows)</td>
+        <td><code>22/08/2026, 5:03 am</code></td>
+        <td>SMS</td>
+        <td><code>DD/MM/YYYY, h:mm am/pm</code> (comma separator, no seconds)</td>
+      </tr>
+      <tr>
+        <td>ISO fallback</td>
+        <td><code>2026-06-01T09:00:00</code></td>
+        <td>Future API / test fixtures</td>
+        <td>Substring slice; no parsing needed</td>
+      </tr>
+    </table>
+    <p>AM/PM edge cases handled explicitly: 12 AM → hour 0 (midnight); 12 PM → hour 12 (noon); 1 PM → hour 13.</p>
+    <p>Rows with unparseable dates are silently dropped from the bucket output (they do not contribute to any count).</p>
+
+    <h3 id="s4d">4d. Journey Discovery</h3>
+    <p><code>discoverJourneyNames()</code> scans <code>MessageName</code> values in the DE, strips channel suffixes (<code>_Email</code>, <code>_SMS</code>, <code>_Push</code>, and space-prefixed variants), and returns up to 100 distinct stems. This is the entry point for overview queries where the user has not specified a journey.</p>
+    <div class="callout warn">
+      <strong>Why MessageName, not JourneyName?</strong>
+      SMS rows in the Comm_Log DE do not populate the <code>JourneyName</code> field. Using <code>MessageName</code> stem as the universal journey identifier ensures SMS journeys appear in overview results alongside email journeys. The stem function <code>messageNameStem()</code> strips the trailing <code>_Email</code> / <code>_SMS</code> / <code>_Push</code> suffix to produce a canonical name.
+    </div>
+    <p>The DE filter uses OR-chained <code>messagename eq</code> clauses covering all known suffix variants so the server-side query returns all rows for a journey regardless of which channel sent them.</p>
+
+    <h3 id="s4e">4e. Session Store</h3>
+    <p>An in-memory <code>Map</code> (<code>SESSION_STORE</code>) keyed by UUID session ID. Each entry holds: <code>viewState</code> (the canonical state object), <code>journeys</code> (populated by <code>runQueryOverview()</code>), and <code>detail</code> (the last <code>NormalizedResponse</code> from a drill query, which includes both <code>buckets</code> and <code>messages</code>). This is a local-process construct — it resets on server restart and cannot be shared across multiple processes or hosts. See §11 for the persistence requirement.</p>
+
+    <h3 id="s4f">4f. SFMC Authentication</h3>
+    <p><code>server.js</code> implements a client-credentials OAuth2 token cache. The token is fetched on the first authenticated request, then reused until 5 minutes before its expiry. Credentials are read from environment variables (<code>SFMC_CLIENT_ID</code>, <code>SFMC_CLIENT_SECRET</code>, <code>SFMC_AUTH_URL</code>, <code>SFMC_BASE_URL</code>, <code>COMMS_DE_KEY</code>).</p>
+  </section>
+
+  
+  <section id="s5">
+    <h2><span class="sec-num">5</span>Conversational Agent</h2>
+
+    <h3>Entry Point</h3>
+    <p><code>handleUserMessage(userMessage, sessionId, mcpTools, options)</code> is the single public interface of the agent layer. It is called by the IBM Bob tool/prompt wrapper with the user's raw text and the available MCP tool set. It returns <code>{ text, handoffOffer, sessionId }</code>.</p>
+
+    <h3>Intent Classification</h3>
+    <p>The lightweight parser (<code>parseIntent()</code>) classifies each message into one of four types:</p>
+    <table>
+      <tr><th>Intent Type</th><th>Trigger</th><th>Action</th></tr>
+      <tr><td><code>journey_query</code></td><td>A named journey is identified in the text</td><td>Run <code>runQueryMessage()</code> for that journey; format chat reply; offer dashboard handoff</td></tr>
+      <tr><td><code>overview_query</code></td><td>Keywords: <em>all journeys, compare, worst, best, ranking, overview, summary, which journey</em></td><td>Discover journey names; run <code>runQueryOverview()</code>; format ranked table; offer handoff</td></tr>
+      <tr><td><code>confirm_handoff</code></td><td>Affirmative one-word responses: <em>yes, sure, ok, go ahead…</em></td><td>Apply pending <code>targetState</code> patch to session; acknowledge in chat</td></tr>
+      <tr><td><code>unknown</code></td><td>Anything else</td><td>Return guided help text; no state mutation</td></tr>
+    </table>
+
+    <h3>Handoff Protocol</h3>
+    <p>The agent <em>never</em> silently mutates session state. After answering a query, it stores a pending <code>handoff_offer</code> object in <code>PENDING_HANDOFFS</code> (an in-memory <code>Map</code>) keyed by session ID. The offer is returned in the response as <code>handoffOffer</code> — the calling surface renders it as a confirmation prompt. Only when the user confirms (or <code>dashboardActive: true</code> is passed for in-context updates) does the agent call <code>patchSessionState()</code>.</p>
+
+    <h3>Context Inheritance</h3>
+    <p>On every turn the agent calls <code>getSessionState()</code> before parsing the query. This means partial queries — "actually show me SMS instead" or "extend to last 30 days" — automatically inherit journey, date range, and drill level from the prior turn without the user restating them.</p>
+  </section>
+
+  
+  <section id="s6">
+    <h2><span class="sec-num">6</span>Dashboard</h2>
+
+    <h3>Screen Structure</h3>
+    <table>
+      <tr><th>Screen</th><th>drillLevel</th><th>Content</th></tr>
+      <tr>
+        <td>Overview</td>
+        <td><code>overview</code></td>
+        <td>Global KPI tiles (total sent, delivery rate, bounce rate, period-over-period delta). Sortable journey table with per-row trend sparklines. All columns sortable: <code>deliveryRate</code>, <code>sent</code>, <code>bounceRate</code>, <code>openRate</code>, <code>clickRate</code>, <code>ctor</code>, <code>undeliveredRate</code>.</td>
+      </tr>
+      <tr>
+        <td>Journey Detail</td>
+        <td><code>journey</code></td>
+        <td>Header with journey name, date range, channel tabs. Area chart for metric trend. Status breakdown bar. Sortable message table (one row per <code>MessageName</code> stem × channel).</td>
+      </tr>
+      <tr>
+        <td>Message Detail</td>
+        <td><code>message</code></td>
+        <td>Hourly or daily trend for a single message. Full status donut/bar. Bucket-level table. CSV export of all time series.</td>
+      </tr>
+    </table>
+
+    <h3>Global Filters</h3>
+    <p>A persistent filter bar across all three screens controls: date range (preset pills + custom date inputs), channel toggle (all / email / SMS / push), and status filter pills (all / delivered / bounced / undelivered / opened / clicked). Filter changes call <code>PATCH /session/:id/state</code> and trigger a data re-fetch.</p>
+
+    <h3>Polling &amp; Staleness Guard</h3>
+    <p>The dashboard polls <code>GET /session/:id/state</code> every 15 seconds. If the returned <code>updatedAt</code> is newer than its locally cached value, it re-fetches the relevant data endpoint for the current drill level. This replaces the SSE/WebSocket approach that was considered and dropped (the agent and dashboard are never simultaneously live in a way that requires server push).</p>
+
+    <h3>Current Runtime Constraints</h3>
+    <ul>
+      <li>JSX is transpiled at runtime by Babel Standalone (loaded from unpkg CDN). This is appropriate for prototyping but is not suitable for production (adds ~2 MB of Babel JS, slow initial compile on low-end devices).</li>
+      <li>React, ReactDOM, Recharts, Lucide, and prop-types are loaded from unpkg CDN UMD bundles — no tree-shaking, no cache control beyond CDN defaults.</li>
+      <li>No minification, code splitting, or bundle integrity hashes (<code>integrity</code> SRI attributes).</li>
+    </ul>
+  </section>
+
+  
+  <section id="s7">
+    <h2><span class="sec-num">7</span>Session State &amp; Chat↔Dashboard Handoff</h2>
+
+    <h3>Canonical viewState Schema</h3>
+    <pre><code>{
+  "sessionId":  "uuid",
+  "viewState": {
+    "journeyId":  "string | null",      // MessageName stem, e.g. "UOM_ETA_Lapsed"
+    "channel":    "email|sms|push|all",
+    "dateRange":  { "start": "ISO8601", "end": "ISO8601", "preset": "last_30d|custom" } | null,
+    "status":     "all|delivered|bounced|undelivered|opened|clicked",
+    "drillLevel": "overview|journey|message",
+    "messageId":  "string | null",
+    "sortBy":     "deliveryRate|sent|bounceRate|openRate|clickRate|ctor|undeliveredRate",
+    "updatedBy":  "agent|dashboard",
+    "updatedAt":  "ISO8601"
+  }
+}</code></pre>
+
+    <h3>Validation Rules</h3>
+    <ul>
+      <li><strong>Last-write-wins:</strong> the most recent PATCH wins regardless of source.</li>
+      <li><strong>Drill-level mismatch guard:</strong> if <code>drillLevel === "message"</code> and the date span &gt; 30 days, the PATCH handler auto-corrects <code>drillLevel</code> to <code>"journey"</code> and sets <code>corrected: true</code> in the response. The calling surface should surface this correction to the user.</li>
+      <li><strong>Explicit user input overrides state:</strong> channel/journey changes from a typed message update only the stated fields; all other viewState fields persist.</li>
+    </ul>
+
+    <h3>Session ID Resolution (Dashboard)</h3>
+    <p>Priority order: (1) <code>?session=</code> URL parameter, (2) <code>localStorage["hr_session_id"]</code>, (3) newly generated <code>crypto.randomUUID()</code>. The resolved ID is written back to both localStorage and the URL so it survives reload and can be shared via URL.</p>
+  </section>
+
+  
+  <section id="s8">
+    <h2><span class="sec-num">8</span>API Reference</h2>
+    <table>
+      <tr><th>Method</th><th>Path</th><th>Purpose</th><th>Key Request Fields</th></tr>
+      <tr>
+        <td>GET</td>
+        <td><code>/session/:id/state</code></td>
+        <td>Read full session state</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>PATCH</td>
+        <td><code>/session/:id/state</code></td>
+        <td>Partial viewState update. Returns corrected state and <code>corrected</code> boolean.</td>
+        <td><code>patch</code> (viewState fields), <code>updatedBy</code></td>
+      </tr>
+      <tr>
+        <td>POST</td>
+        <td><code>/api/overview</code></td>
+        <td>Populate journey index for Overview screen. Runs discovery + parallel journey queries. Returns <code>journeys</code> array and discovered <code>journeyNames</code>.</td>
+        <td><code>sessionId</code>, <code>journeyNames?</code>, <code>dateRange?</code></td>
+      </tr>
+      <tr>
+        <td>POST</td>
+        <td><code>/api/query</code></td>
+        <td>Journey-level drill. Runs <code>runQueryMessage()</code>. Writes detail to session.</td>
+        <td><code>sessionId</code>, <code>journeyId</code>, <code>channel?</code>, <code>range?</code></td>
+      </tr>
+      <tr>
+        <td>POST</td>
+        <td><code>/api/query/message</code></td>
+        <td>Message-level drill. Scoped to a single <code>MessageName</code> stem.</td>
+        <td><code>sessionId</code>, <code>journeyId</code>, <code>messageId?</code></td>
+      </tr>
+    </table>
+    <p>All endpoints return <code>{ code, message }</code> on validation errors (400) and <code>{ error: "Internal error" }</code> on 500s (no stack trace or system detail is exposed to the client).</p>
+  </section>
+
+  
+  <section id="s9">
+    <h2><span class="sec-num">9</span>Test Suite</h2>
+    <p>Both backend logic layers have a full unit + integration test suite run with Node's built-in test runner (<code>node:test</code> + <code>assert/strict</code>). No external test framework is required.</p>
+
+    <pre><code># Run backend tests
+node --test Headless_Reporting_Agent_Backend.test.js
+
+# Run agent tests
+node --test Headless_Reporting_Agent.test.js</code></pre>
+
+    <h3>Backend Test Coverage (<code>Headless_Reporting_Agent_Backend.test.js</code>)</h3>
+    <table>
+      <tr><th>Suite</th><th>Tests</th><th>What is covered</th></tr>
+      <tr>
+        <td><code>computeRates()</code></td>
+        <td>5</td>
+        <td>Correct calculation of all 6 rate fields; zero-denominator safety; non-mutation of original; field preservation.</td>
+      </tr>
+      <tr>
+        <td><code>filterByStatus()</code></td>
+        <td>7</td>
+        <td>Status <code>"all"</code> passthrough; zeroing of non-selected columns; <code>sent</code> preserved as denominator for all statuses; non-mutation of input.</td>
+      </tr>
+      <tr>
+        <td><code>parseQuery()</code></td>
+        <td>12</td>
+        <td>Missing journey error (<code>MISSING_JOURNEY</code>); journeyId from raw and inherited state; default and supplied metrics; relative range resolution (<code>last_7d</code>, <code>last_30d</code>); explicit <code>dateRange</code> object; <code>groupBy</code> derivation; default channel; channel inheritance.</td>
+      </tr>
+      <tr>
+        <td><code>normalizeRestRows()</code></td>
+        <td>13</td>
+        <td>Empty input; null/unparseable dates discarded; day grouping; hour grouping; <code>Sent</code> / <code>Delivered</code> / <code>Opened</code> / <code>Clicked</code> / <code>Bounced</code> / <code>Undelivered</code> status counting; sort order; AM/PM edge cases (noon, midnight); ISO fallback; <strong>SMS AU-locale date format</strong> (<code>DD/MM/YYYY, h:mm am/pm</code>) for both day and hour groupBy.</td>
+      </tr>
+      <tr>
+        <td><code>patchSessionState()</code></td>
+        <td>6</td>
+        <td>No correction when span ≤ 30 days at message level; correction to journey level when span &gt; 30 days; no correction for journey/overview drill levels; field merge without overwrite; <code>updatedBy</code> / <code>updatedAt</code> stamping; first-call initialisation.</td>
+      </tr>
+      <tr>
+        <td><code>normalizeMessageRows()</code></td>
+        <td>8</td>
+        <td>Empty input; grouping by <code>MessageName</code>; <code>id</code> / <code>name</code> / <code>channel</code> / <code>buckets</code> fields present; channel lower-cased; per-message metric isolation (no cross-contamination); sort by total sent descending; <code>"(unnamed)"</code> fallback for missing <code>MessageName</code>; computed rate fields present in buckets.</td>
+      </tr>
+    </table>
+
+    <h3>Agent Test Coverage (<code>Headless_Reporting_Agent.test.js</code>)</h3>
+    <table>
+      <tr><th>Suite</th><th>Tests</th><th>What is covered</th></tr>
+      <tr>
+        <td><code>parseIntent()</code></td>
+        <td>17</td>
+        <td>Intent classification for all four types (<code>confirm_handoff</code>, <code>overview_query</code>, <code>journey_query</code>, <code>unknown</code>); channel extraction (email, sms, push, default all); range extraction (last_7d, last_30d, this_month, null); metric hint extraction; journey name extraction from quoted strings, "for X journey", and "how did X perform" patterns; no duplicate metrics.</td>
+      </tr>
+      <tr>
+        <td><code>sumBuckets()</code></td>
+        <td>3</td>
+        <td>Summing all six metric fields; computed rates on totals; empty array graceful handling.</td>
+      </tr>
+      <tr>
+        <td><code>formatJourneyResponse()</code></td>
+        <td>5</td>
+        <td>Journey name present; key metrics included; opens/clicks omitted for SMS; no-data message; date range included.</td>
+      </tr>
+      <tr>
+        <td><code>formatOverviewResponse()</code></td>
+        <td>5</td>
+        <td>No-data message; journey names present; markdown table header; date range; sorted by delivery rate descending.</td>
+      </tr>
+      <tr>
+        <td><code>buildJourneyHandoff()</code></td>
+        <td>6</td>
+        <td><code>type='handoff_offer'</code>; <code>confirmationRequired=true</code>; journey name in message; <code>targetState</code> fields; drill-correction note and <code>drillLevel='journey'</code> when <code>drillCorrected=true</code>.</td>
+      </tr>
+      <tr>
+        <td><code>buildOverviewHandoff()</code></td>
+        <td>4</td>
+        <td><code>type='handoff_offer'</code> with <code>drillLevel='overview'</code>; <code>confirmationRequired=true</code>; channel propagation; default channel.</td>
+      </tr>
+      <tr>
+        <td><code>resolveRange()</code></td>
+        <td>4</td>
+        <td>Preset key resolution; explicit <code>dateRange</code> object passthrough; viewState fallback; default to last 30 days.</td>
+      </tr>
+      <tr>
+        <td><code>handleUserMessage()</code> — integration</td>
+        <td>12</td>
+        <td>New session creation; sessionId echo; non-empty text; journey name in reply; handoff offer present; <code>dashboardActive</code> suppresses offer; confirm handoff commits + clears pending; no-pending graceful handling; unknown query guidance; <code>MISSING_JOURNEY</code> path; overview table from DE data; messages array populated in session detail after journey query.</td>
+      </tr>
+    </table>
+
+    <div class="callout ok">
+      <strong>All tests pass — 114 total (58 backend + 56 agent)</strong>
+      Both test files pass fully under <code>node --test</code>. No external packages are required beyond Node ≥ 18 built-ins.
+    </div>
+  </section>
+
+
+  <section id="s10">
+    <h2><span class="sec-num">10</span>Local Dependencies (What Is Not Yet Portable)</h2>
+    <p>The following items are hard or soft dependencies on the local development environment or on IBM Bob. Each must be resolved before the solution can run in any other environment.</p>
+
+    <div class="dep-row">
+      <div class="dep-name">IBM Bob / Bob Agent Platform <span class="badge badge-crit">Hard</span></div>
+      <div class="dep-detail">
+        <strong>What it provides:</strong> The MCP server (<code>SFMC_MCP</code>) that exposes <code>sfmc_query_data_extension_rows</code> and other SFMC tools as callable functions within the Bob conversation context. When running inside Bob, the agent passes these MCP tools directly to the backend.<br />
+        <strong>Why it's a blocker:</strong> The chat agent layer (<code>Headless_Reporting_Agent.js</code>) requires an <code>mcpTools</code> object to be injected by a calling context. Outside Bob, this is provided by the <code>server.js</code> MCP shim — but that shim only replicates <code>sfmc_query_data_extension_rows</code>. Any future query path that uses other MCP tools (e.g. <code>sfmc_get_journeys</code> for journey name discovery) has no equivalent outside Bob.<br />
+        <strong>Mitigation in place:</strong> <code>server.js</code> implements a standalone REST shim for <code>sfmc_query_data_extension_rows</code>. The server runs fully without Bob for all currently implemented query paths.
+      </div>
+    </div>
+
+    <div class="dep-row">
+      <div class="dep-name">Local process hosting <span class="badge badge-crit">Hard</span></div>
+      <div class="dep-detail">
+        <strong>What it provides:</strong> <code>node server.js</code> on the developer's machine, listening on <code>127.0.0.1:3000</code>.<br />
+        <strong>Why it's a blocker:</strong> The server binds to loopback only. The session store is in-memory and does not persist across restarts. There is no process manager, health check, or restart policy. Any other user, service, or deployment cannot reach this server.<br />
+        <strong>Mitigation in place:</strong> None — this is intentional for a local prototype.
+      </div>
+    </div>
+
+    <div class="dep-row">
+      <div class="dep-name">In-memory session store <span class="badge badge-crit">Hard</span></div>
+      <div class="dep-detail">
+        <strong>What it provides:</strong> <code>SESSION_STORE</code> — a Node.js <code>Map</code> held in process memory.<br />
+        <strong>Why it's a blocker:</strong> State is lost on any server restart, deployment, or crash. A multi-process deployment (load balancer, multiple replicas) would route requests to different session states. There is no TTL — sessions accumulate until the process is restarted.<br />
+        <strong>Mitigation in place:</strong> None required for single-user local use.
+      </div>
+    </div>
+
+    <div class="dep-row">
+      <div class="dep-name">SFMC credentials in environment <span class="badge badge-warn">Soft</span></div>
+      <div class="dep-detail">
+        <strong>What it provides:</strong> <code>SFMC_CLIENT_ID</code>, <code>SFMC_CLIENT_SECRET</code>, <code>SFMC_AUTH_URL</code>, <code>SFMC_BASE_URL</code> loaded via <code>dotenv</code> from a <code>.env</code> file on the local filesystem.<br />
+        <strong>Why it matters:</strong> A <code>.env</code> file in the project root is not a production secret-management pattern. If committed to version control it exposes credentials. The server handles missing credentials gracefully (returns empty results), but does not block startup with a clear error.<br />
+        <strong>Mitigation in place:</strong> dotenv is only used at startup; the code reads from <code>process.env</code>. Migrating to a secrets manager requires only changing the injection mechanism, not the code.
+      </div>
+    </div>
+
+    <div class="dep-row">
+      <div class="dep-name">Runtime Babel transpile of JSX <span class="badge badge-warn">Soft</span></div>
+      <div class="dep-detail">
+        <strong>What it provides:</strong> <code>@babel/standalone</code> loaded from unpkg CDN; transpiles <code>Headless_Reporting_Dashboard.jsx</code> on every page load in the browser.<br />
+        <strong>Why it matters:</strong> ~2 MB additional download, ~300–800 ms compile time per page load on average hardware. CDN availability dependency. No SRI hash on the CDN scripts (supply-chain risk). Not acceptable for production performance or security posture.<br />
+        <strong>Mitigation in place:</strong> None — explicitly noted in <code>index.html</code> as "prototype use only".
+      </div>
+    </div>
+
+    <div class="dep-row">
+      <div class="dep-name">CDN-sourced frontend dependencies <span class="badge badge-warn">Soft</span></div>
+      <div class="dep-detail">
+        <strong>What it provides:</strong> React 18, ReactDOM, Recharts 2, Lucide React, prop-types — all loaded from <code>unpkg.com</code> UMD bundles.<br />
+        <strong>Why it matters:</strong> No Subresource Integrity (SRI) hashes, no pinned versions beyond the semver range, runtime CDN dependency, no tree-shaking (full library bundles), no offline capability.<br />
+        <strong>Mitigation in place:</strong> None — acceptable for local development only.
+      </div>
+    </div>
+
+    <div class="dep-row">
+      <div class="dep-name">Permissive CORS policy <span class="badge badge-warn">Soft</span></div>
+      <div class="dep-detail">
+        <strong>What it provides:</strong> <code>app.use(cors())</code> — allows all origins, all methods, all headers.<br />
+        <strong>Why it matters:</strong> Appropriate for local development where the dashboard and API are same-origin. In production, any deployment where the dashboard is hosted separately (e.g. CDN) from the API requires an explicit origin allowlist.<br />
+        <strong>Mitigation in place:</strong> Service binds to <code>127.0.0.1</code> which limits exposure to localhost only.
+      </div>
+    </div>
+
+    <div class="dep-row">
+      <div class="dep-name">No dashboard authentication <span class="badge badge-crit">Hard (for production)</span></div>
+      <div class="dep-detail">
+        <strong>What it provides:</strong> None — anyone who can reach the server URL and knows (or guesses) a session ID can read that session's data.<br />
+        <strong>Why it matters:</strong> The dashboard displays communications data about AusNet customers. Unauthenticated access is not acceptable beyond a developer's localhost.<br />
+        <strong>Mitigation in place:</strong> Network boundary (loopback only). No mitigation suitable for production.
+      </div>
+    </div>
+  </section>
+
+  
+  <section id="s11">
+    <h2><span class="sec-num">11</span>Productionisation Requirements</h2>
+    <p>The following work items must be completed before this solution can be deployed to any environment accessible beyond the developer's machine. Items are grouped by priority.</p>
+
+    <h3>P0 — Blocking (Must Have Before Any Deployment)</h3>
+
+    <h4>1. Backend Hosting Decision</h4>
+    <p>Choose a hosting target. The backend is a standard Node.js Express application with no build step — it can run on any of the following:</p>
+    <table>
+      <tr><th>Option</th><th>Fit</th><th>Notes</th></tr>
+      <tr><td>Containerised service (Docker + Kubernetes / ECS)</td><td>Best for enterprise</td><td>Full control; add a process manager (PM2 or the container restart policy); horizontal scaling requires external session store (see item 2)</td></tr>
+      <tr><td>Serverless function (AWS Lambda, Azure Functions, Cloudflare Workers)</td><td>Good for low-traffic admin tooling</td><td>In-memory session store is per-invocation — external store <strong>required</strong>; cold-start latency on infrequent use; Cloudflare Workers requires removing Node-specific APIs</td></tr>
+      <tr><td>PaaS (Heroku, Railway, Render)</td><td>Simplest path</td><td>Works with minimal changes; external session store still needed for multi-dyno setups</td></tr>
+    </table>
+    <p>The existing bind of <code>127.0.0.1</code> in <code>server.js</code> must be changed to an explicit interface or removed (to let the platform bind correctly) before deployment.</p>
+
+    <h4>2. External Session Store</h4>
+    <p>Replace the in-memory <code>SESSION_STORE</code> <code>Map</code> with a persistent, shared store. The interface is minimal — only <code>get</code>, <code>set</code> operations on a string key.</p>
+    <ul>
+      <li><strong>Redis</strong> (Azure Cache for Redis, AWS ElastiCache, Upstash for serverless) — recommended. Add TTL of 24h per session. Requires adding the <code>ioredis</code> or <code>@upstash/redis</code> package and replacing the three lines in <code>getSessionState</code> / <code>SESSION_STORE.set()</code>.</li>
+      <li><strong>DynamoDB / Cosmos DB / Firestore</strong> — viable for serverless. Slightly higher latency per read/write than Redis.</li>
+    </ul>
+
+    <h4>3. Authentication &amp; Authorisation</h4>
+    <p>The dashboard and all API endpoints must be protected before deployment. Recommended approach:</p>
+    <ul>
+      <li>Integrate with AusNet's existing IdP (Azure AD / Entra ID) via OpenID Connect. Use <code>passport-azure-ad</code> (OIDC strategy) as Express middleware on all routes.</li>
+      <li>Enforce MFA at the IdP level — this requires no application-level code change if the IdP conditional access policy requires it.</li>
+      <li>The session cookie should be set with <code>Secure</code>, <code>HttpOnly</code>, and <code>SameSite=Strict</code> flags.</li>
+      <li>Role-based access: read-only access to deliverability data is likely appropriate for a broad analyst group; no write access to SFMC data is possible through this application.</li>
+    </ul>
+
+    <h4>4. SFMC Credential Management</h4>
+    <p>Remove the <code>.env</code> file pattern. Inject credentials via the hosting platform's secret management:</p>
+    <ul>
+      <li>Azure: Azure Key Vault with Managed Identity (no code change required — the existing <code>process.env</code> reads stay; the platform injects secrets as env vars).</li>
+      <li>AWS: Secrets Manager or Parameter Store via environment variable injection in the task definition.</li>
+      <li>Ensure the SFMC installed package has the minimum required scope: <strong>Data Extensions → Read</strong> only. No write scopes are needed by this application.</li>
+    </ul>
+
+    <h4>5. TLS / HTTPS</h4>
+    <p>All traffic to the service must be over TLS 1.2+. In practice this is handled by the load balancer or ingress layer — the Node application itself does not need to terminate TLS. Ensure the CDN / load balancer certificate is valid and not self-signed.</p>
+
+    <h3>P1 — Required for Production Quality</h3>
+
+    <h4>6. Frontend Build Pipeline</h4>
+    <p>Replace runtime Babel + CDN UMD bundles with a proper build step:</p>
+    <ol>
+      <li>Add a build tool: <strong>Vite</strong> is the simplest choice (zero-config JSX + React support, excellent tree-shaking). Add <code>vite</code>, <code>@vitejs/plugin-react</code> to devDependencies.</li>
+      <li>Add explicit package dependencies: <code>react</code>, <code>react-dom</code>, <code>recharts</code>, <code>lucide-react</code>.</li>
+      <li>Remove the CDN <code>&lt;script&gt;</code> tags from <code>index.html</code> and replace with Vite's injected bundle references.</li>
+      <li>Output to a <code>dist/</code> directory. Point <code>express.static()</code> at <code>dist/</code> or serve from a CDN with cache headers.</li>
+      <li>Add SRI hashes to any remaining external resources.</li>
+    </ol>
+
+    <h4>7. CORS Hardening</h4>
+    <p>Replace <code>cors()</code> with an explicit origin allowlist:</p>
+    <pre><code>app.use(cors({
+  origin: process.env.ALLOWED_ORIGINS?.split(",") ?? [],
+  credentials: true,
+}));</code></pre>
+
+    <h4>8. Structured Logging</h4>
+    <p>Replace <code>console.log</code> / <code>console.error</code> calls with a structured logger (e.g. <code>pino</code>). Ensure no sensitive data (SFMC tokens, subscriber keys, email addresses) appears in log output. Set log level via environment variable. Route logs to the platform's log aggregator (CloudWatch, Azure Monitor, etc.).</p>
+
+    <h4>9. Health &amp; Readiness Endpoints</h4>
+    <p>Add <code>GET /health</code> (liveness) and <code>GET /ready</code> (readiness — confirms SFMC token is obtainable and session store is reachable). Required by Kubernetes probes, load balancer health checks, and monitoring.</p>
+
+    <h4>10. Rate Limiting &amp; Request Validation</h4>
+    <p>Add <code>express-rate-limit</code> on the query endpoints (<code>/api/overview</code>, <code>/api/query</code>, <code>/api/query/message</code>) to prevent accidental or deliberate DE over-querying. Each overview query can fan out to 100+ parallel DE page reads — a tight rate limit (e.g. 5 req/min per authenticated user) is appropriate.</p>
+
+    <h3>P2 — Dashboard Completeness</h3>
+
+    <h4>11. Remove Seeded Mock Data</h4>
+    <p>The Overview screen currently falls back to seeded mock journey data when no real data is available in the session. This fallback should be removed or gated behind a clearly visible "demo mode" indicator. The real data path (<code>POST /api/overview</code> → <code>runQueryOverview()</code>) is fully implemented; the dashboard needs to call it on initial load and on date-range changes.</p>
+
+    <h4>12. Error States &amp; Empty States</h4>
+    <p>Add explicit UI states for: (a) SFMC query error (network failure, token expired), (b) no data for the selected filter combination, (c) partial data (some journeys returned no results in the window). The <code>EmptyState</code> component exists in the dashboard but is not wired to all failure paths.</p>
+
+    <h4>13. SMS Undelivered Reason Breakdown</h4>
+    <p>The DE includes <code>smsUndeliveredStatus</code> and <code>smsUndeliveredReason</code> fields which are currently not surfaced in the dashboard. These are high-value for SMS debugging and should be added as a secondary breakdown table on the Message Detail screen for SMS channel queries.</p>
+
+    <h3>P3 — Optional / Future</h3>
+
+    <h4>14. Bob Integration Wrapper</h4>
+    <p>For the chat agent to run within Bob, a thin Bob tool or prompt must call <code>handleUserMessage()</code> and pass the available MCP tools. This wrapper is not yet written. It requires: importing <code>Headless_Reporting_Agent.js</code> as a module (or copying the logic into a Bob script), passing <code>sfmc_query_data_extension_rows</code> from the Bob MCP tool context, and returning the <code>text</code> and <code>handoffOffer</code> to the Bob response.</p>
+
+    <h4>15. Dashboard URL Sharing</h4>
+    <p>The <code>?session=</code> URL parameter already enables session sharing. To make this useful, the session link should deep-link to the current drill level and filters. This requires encoding the full <code>viewState</code> in the URL (as base64 or individual params) rather than just the session ID.</p>
+
+    <h4>16. Rollup Data Extension</h4>
+    <p>The spec recommends a pre-aggregated <code>journey × channel × day</code> rollup DE for Overview and trend queries, built by a scheduled SQL Query Activity. The current implementation queries the raw Comm_Log DE for all views, which works but is slower and more DE-quota-intensive for large date ranges. Implementing the rollup DE would improve Overview load time significantly.</p>
+  </section>
+
+  
+  <section id="s12">
+    <h2><span class="sec-num">12</span>Open Items &amp; Known Gaps</h2>
+
+    <table>
+      <tr><th>Item</th><th>Status</th><th>Blocking?</th></tr>
+      <tr><td>Dashboard hosting decision (standalone web app vs. embed)</td><td><span class="badge badge-warn">Open</span></td><td>Yes — affects auth integration and CORS config</td></tr>
+      <tr><td>Dashboard real-data layer: replace mock data with session-state buckets</td><td><span class="badge badge-warn">Partially done</span></td><td>Yes — mock fallback must be removed before production</td></tr>
+      <tr><td>Bob integration wrapper (calling <code>handleUserMessage</code> from Bob tool/prompt)</td><td><span class="badge badge-warn">Open</span></td><td>Yes — required for chat agent to function in Bob</td></tr>
+      <tr><td>External session store (Redis or equivalent)</td><td><span class="badge badge-warn">Open</span></td><td>Yes — in-memory store is not production-safe</td></tr>
+      <tr><td>Authentication (OIDC / Azure AD)</td><td><span class="badge badge-warn">Open</span></td><td>Yes — unauthenticated access to customer comms data is not acceptable</td></tr>
+      <tr><td>Frontend build pipeline (replace runtime Babel)</td><td><span class="badge badge-warn">Open</span></td><td>Yes — performance and supply-chain risk</td></tr>
+      <tr><td>SMS undelivered reason breakdown in dashboard</td><td><span class="badge badge-warn">Open</span></td><td>No — enhancement</td></tr>
+      <tr><td>Rollup DE for overview queries</td><td><span class="badge badge-warn">Open</span></td><td>No — performance optimisation only</td></tr>
+      <tr><td>DE field names and types confirmed from Comm_Log_Schema.csv</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+      <tr><td>MessageStatus exhaustive value set confirmed</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+      <tr><td>SentDate US-locale format confirmed and explicit parser implemented</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+      <tr><td>SentDate AU-locale SMS format (<code>DD/MM/YYYY, h:mm am/pm</code>) confirmed and parser extended</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+      <tr><td>All metrics routed to Comm_Log DE (no MCP split needed)</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+      <tr><td>SSE / WebSocket requirement (dropped — polling is sufficient)</td><td><span class="badge badge-ok">Resolved — dropped</span></td><td>—</td></tr>
+      <tr><td>Metric formulas confirmed and locked in code</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+      <tr><td>Status filter pill wired across all three screens</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+      <tr><td><code>normalizeMessageRows()</code> implemented for Journey Detail message table</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+      <tr><td><code>filterByStatus()</code> implemented for status-pill filtering of bucket data</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+      <tr><td>Journey discovery uses <code>MessageName</code> stem (not <code>JourneyName</code>) — SMS fix</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+      <tr><td>Full unit + integration test suite for backend and agent layers</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+      <tr><td><code>parseQuery()</code> defaults to <code>last_30d</code> when no range is specified</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+      <tr><td>Agent test suite completed — 56 tests across 8 suites (<code>parseIntent</code>, <code>sumBuckets</code>, <code>formatJourneyResponse</code>, <code>formatOverviewResponse</code>, <code>buildJourneyHandoff</code>, <code>buildOverviewHandoff</code>, <code>resolveRange</code>, <code>handleUserMessage</code> integration)</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+      <tr><td><code>parseIntent()</code> suite count corrected from 15 to 17 tests; <code>handleUserMessage()</code> integration suite corrected from 10 to 12 tests; total test count updated to 114</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+      <tr><td>E2E demo preparation guide created (<code>e2e-demo-preparation-guide.html</code>) — environment checklist, env-var reference, 15–20 min demo script with say/show columns</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+      <tr><td>Handover summary artefact created (<code>headless-reporting-handover-summary.html</code>) — one-page stakeholder-facing overview of what is real, what is stubbed, and next steps</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+    </table>
+  </section>
+
+  <div class="doc-footer">Made with IBM Bob</div>
+</div>
+</body>
+</html>
