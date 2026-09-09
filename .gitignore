@@ -9,8 +9,16 @@ server.err.log
 .env
 .env.*
 
-# Local AI assistant config
+# Local AI assistant config and temp files
 .bob/
+
+# Salesforce CLI local org metadata (contains credentials)
+.sf/
+
+# Generated HTML report artefacts
+e2e-demo-preparation-guide.html
+headless-reporting-handover-summary.html
+headless-reporting-technical-solution-documentation.html
 
 # OS artefacts
 .DS_Store
